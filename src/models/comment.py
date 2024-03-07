@@ -7,10 +7,11 @@ from .base import Base, id_col, created_at_col, updated_at_col
 
 if TYPE_CHECKING:
     from .advert import AdvertModel
+    from .user import UserModel
 
 
 class CommentModel(Base):
-    """Represents comments left by users under other users adverts"""
+    """Represents comments left by users under adverts"""
 
     __tablename__ = "Comment"
     __repr_cols__ = ("id", "body", "created_at", "advert_id")
@@ -21,3 +22,8 @@ class CommentModel(Base):
 
     advert_id: Mapped[int] = mapped_column(ForeignKey("Advert.id", ondelete="CASCADE"))
     advert: Mapped["AdvertModel"] = relationship(back_populates="comments")
+
+    user_id: Mapped[int | None] = mapped_column(
+        ForeignKey("User.id", ondelete="SET NULL")
+    )
+    user: Mapped["UserModel"] = relationship(back_populates="comments")
