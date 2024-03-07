@@ -47,9 +47,7 @@ def upgrade() -> None:
         ),
         sa.Column("is_hidden", sa.Boolean(), nullable=False),
         sa.Column("advertiser_id", sa.Integer(), nullable=False),
-        sa.ForeignKeyConstraint(
-            ["advertiser_id"], ["User.id"], ondelete="CASCADE"
-        ),
+        sa.ForeignKeyConstraint(["advertiser_id"], ["User.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
     )
     op.create_table(
@@ -63,9 +61,7 @@ def upgrade() -> None:
         ),
         sa.Column("body", sa.Text(), nullable=False),
         sa.Column("advert_id", sa.Integer(), nullable=False),
-        sa.ForeignKeyConstraint(
-            ["advert_id"], ["Advert.id"], ondelete="CASCADE"
-        ),
+        sa.ForeignKeyConstraint(["advert_id"], ["Advert.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
     )
     op.create_table(
@@ -80,12 +76,8 @@ def upgrade() -> None:
         ),
         sa.Column("complainant_id", sa.Integer(), nullable=True),
         sa.Column("advert_id", sa.Integer(), nullable=False),
-        sa.ForeignKeyConstraint(
-            ["advert_id"], ["Advert.id"], ondelete="CASCADE"
-        ),
-        sa.ForeignKeyConstraint(
-            ["complainant_id"], ["User.id"], ondelete="SET NULL"
-        ),
+        sa.ForeignKeyConstraint(["advert_id"], ["Advert.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["complainant_id"], ["User.id"], ondelete="SET NULL"),
         sa.PrimaryKeyConstraint("id"),
     )
     # ### end Alembic commands ###
