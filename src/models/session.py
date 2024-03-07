@@ -20,4 +20,4 @@ class SessionModel(Base):
     expires: Mapped[datetime]
 
     user_id: Mapped[int] = mapped_column(ForeignKey("User.id", ondelete="CASCADE"))
-    user: Mapped['UserModel'] = relationship(back_populates="sessions")
+    user: Mapped["UserModel"] = relationship(back_populates="sessions")

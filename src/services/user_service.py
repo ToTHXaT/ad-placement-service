@@ -15,7 +15,7 @@ async def signup(user_c: UserCreate, *, conn: AsyncSession) -> UserInfo:
             email=user_c.email,
             phone=user_c.phone,
             shown_name=user_c.shown_name,
-            is_admin=False
+            is_admin=False,
         )
         conn.add(user)
         await conn.commit()

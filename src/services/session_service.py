@@ -19,7 +19,7 @@ def generate_refresh_token() -> str:
     return uuid.uuid4().hex
 
 
-async def authenticate_by_access_token(access_token: str) -> bool:
+async def authenticate_by_access_token(access_token: str) -> UserInfo:
     try:
         data = jwt.decode(
             access_token, config.jwt_secret, algorithms=[config.jwt_algorithm]
@@ -27,30 +27,41 @@ async def authenticate_by_access_token(access_token: str) -> bool:
     except jwt.exceptions.ExpiredSignatureError:
         raise HTTPException(401, "Access token expired. Please login again.")
 
-    return True
+    return data["user"]
 
 
 async def refresh_tokens(refresh_token: str, *, conn: AsyncSession) -> tuple[str, str]:
-    q = select(SessionModel).where(SessionModel.token == refresh_token)
+    q = select(SessionModel).where(SessionModel.token == refresh_token).options(joinedload(SessionModel.user))
     data = await conn.execute(q)
 
     if not (session := data.scalar_one_or_none()):
         raise HTTPException(401, "Refresh token is invalid")
+    if session.expires < datetime.utcnow():
+        raise HTTPException(401, "Refresh token expired")
 
-    async with conn.begin():
+    user_info = UserInfo.from_orm(session.user).dict()
+    user_info["registered_at"] = user_info["registered_at"].isoformat()
+
+    async with conn.begin_nested():
         user_id = session.user_id
         await conn.delete(session)
         session = SessionModel(
             user_id=user_id,
             token=generate_refresh_token(),
-            expires_at=datetime.utcnow() + timedelta(days=config.access_token_duration),
+            expires=datetime.utcnow() + timedelta(days=config.access_token_duration_minutes),
         )
         conn.add(session)
-        await conn.commit()
         refresh_token = session.token
+        await conn.commit()
 
     access_token = jwt.encode(
-        UserInfo.from_orm(session.user), config.jwt_secret, algorithm=config
+        {
+            "user": user_info,
+            "exp": datetime.utcnow()
+                   + timedelta(minutes=config.access_token_duration_minutes),
+        },
+        config.jwt_secret,
+        algorithm=config.jwt_algorithm,
     )
 
     return refresh_token, access_token
