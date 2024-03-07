@@ -27,7 +27,7 @@ async def authenticate_by_access_token(access_token: str) -> UserInfo:
     except jwt.exceptions.ExpiredSignatureError:
         raise HTTPException(401, "Access token expired. Please login again.")
 
-    return data["user"]
+    return UserInfo(**data["user"])
 
 
 async def refresh_tokens(refresh_token: str, *, conn: AsyncSession) -> tuple[str, str]:
