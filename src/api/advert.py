@@ -20,18 +20,23 @@ async def create_advert(
     return await advert_service.create_advert(advert_c, user, conn=conn)
 
 
-@advert.get("/get/{id}")
+@advert.get("/all", response_model=list[AdvertInfo])
+async def list_all_adverts(
+        sort_dir: SortDir, sort_by: SortField, conn: AsyncSession = Depends(make_session),
+        page: int = 1, per_page: int = 10
+) -> list[AdvertInfo]:
+    return await advert_service.list_adverts(
+        sort_by=sort_by, sort_dir=sort_dir, conn=conn, page=page, per_page=per_page
+    )
+
+
+@advert.get("/{id}")
 async def get_advert_details(
     id: int, conn: AsyncSession = Depends(make_session)
 ) -> AdvertInfo:
     return await advert_service.get_advert(id, conn=conn)
 
 
-@advert.get("/all", response_model=list[AdvertInfo])
-async def some(
-    sort_dir: SortDir, sort_by: SortField, conn: AsyncSession = Depends(make_session),
-        page: int = 1, per_page: int = 10
-) -> list[AdvertInfo]:
-    return await advert_service.list_adverts(
-        sort_by=sort_by, sort_dir=sort_dir, conn=conn, page=page, per_page=per_page
-    )
+@advert.delete('/{id}')
+async def delete_advert(id: int, user: UserInfo = Depends(get_current_user), conn: AsyncSession = Depends(make_session)):
+    return await advert_service.delete_advert(id, user, conn=conn)

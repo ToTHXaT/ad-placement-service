@@ -1,12 +1,10 @@
-from datetime import datetime, timedelta
-from typing_extensions import TypedDict
-
 from fastapi import APIRouter, Security, Depends, Request, Response, HTTPException
 from fastapi.security.api_key import APIKeyCookie
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.config import config
+from src.shemas import Success
 
 from src.services import session_service
 from src.services import user_service
@@ -74,10 +72,6 @@ async def login(
     set_cookie_tokens(refresh_token, access_token, res)
 
     return user
-
-
-class Success(TypedDict):
-    success: bool
 
 
 @auth.get("/refresh_tokens")

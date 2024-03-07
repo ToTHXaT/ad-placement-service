@@ -3,15 +3,15 @@ from typing import Literal
 from fastapi import HTTPException
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.sql import select, asc, desc
+from sqlalchemy.sql import select, delete, asc, desc
 from sqlalchemy.orm import joinedload
 
 from src.models import AdvertModel, AdvertType
-from src.shemas import AdvertCreation, AdvertInfo, UserInfo
+from src.shemas import AdvertCreation, AdvertInfo, UserInfo, Success
 
 
 async def create_advert(
-    advert_c: AdvertCreation, user: UserInfo, conn: AsyncSession
+    advert_c: AdvertCreation, user: UserInfo, *,conn: AsyncSession
 ) -> AdvertInfo:
     async with conn.begin_nested():
         advert = AdvertModel(**{**advert_c.dict(), "advertiser_id": user.id})
@@ -22,7 +22,7 @@ async def create_advert(
     return AdvertInfo.from_orm(advert)
 
 
-async def get_advert(advert_id: int, conn: AsyncSession) -> AdvertInfo:
+async def get_advert(advert_id: int, *, conn: AsyncSession) -> AdvertInfo:
     q = (
         select(AdvertModel)
         .where(AdvertModel.id == advert_id)
@@ -44,11 +44,13 @@ SortField = Literal[
     "body",
 ]
 SortDir = Literal["asc", "desc"]
-FilterField = Literal[""]
+
+
+# class Filter(BaseModel)
 
 
 async def list_adverts(
-    conn: AsyncSession, page: int, per_page: int, sort_by: SortField = "created_at", sort_dir: SortDir = "desc"
+    page: int, per_page: int, sort_by: SortField = "created_at", sort_dir: SortDir = "desc", *, conn: AsyncSession
 ) -> list[AdvertInfo]:
     match sort_dir:
         case "asc":
@@ -69,3 +71,17 @@ async def list_adverts(
     return [AdvertInfo.from_orm(adv) for adv in res.scalars()]
 
 
+async def delete_advert(advert_id: int, user: UserInfo, *, conn: AsyncSession) -> Success:
+    q = select(AdvertModel.advertiser_id).where(AdvertModel.id == advert_id)
+    res = await conn.execute(q)
+    advert = res.one_or_none()
+
+    if advert[0] != user.id:
+        raise HTTPException(403, "No advert or not the advert owner")
+
+    async with conn.begin_nested():
+        q = delete(AdvertModel).where(AdvertModel.id == advert_id)
+        await conn.execute(q)
+        await conn.commit()
+
+    return {"success": True}
