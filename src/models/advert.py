@@ -32,7 +32,6 @@ class AdvertModel(Base):
     compensation: Mapped[str | None]
     location: Mapped[str | None]
     type: Mapped[AdvertType]
-    is_hidden: Mapped[bool] = mapped_column(default=False)
 
     advertiser_id: Mapped[int] = mapped_column(
         ForeignKey("User.id", ondelete="CASCADE")
