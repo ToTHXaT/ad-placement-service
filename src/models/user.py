@@ -13,6 +13,7 @@ if TYPE_CHECKING:
     from .advert import AdvertModel
     from .complaint import ComplaintModel
     from .session import SessionModel
+    from .comment import CommentModel
 
 
 pwd_ctx = CryptContext(
@@ -42,6 +43,7 @@ class UserModel(Base):
     complaints: Mapped[list["ComplaintModel"]] = relationship(
         back_populates="complainant"
     )
+    comments: Mapped[list["CommentModel"]] = relationship(back_populates="user")
 
     sessions: Mapped[list["SessionModel"]] = relationship(back_populates="user")
 

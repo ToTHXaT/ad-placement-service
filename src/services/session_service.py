@@ -19,7 +19,7 @@ def generate_refresh_token() -> str:
     return uuid.uuid4().hex
 
 
-async def authenticate_by_access_token(access_token: str) -> UserInfo:
+def authenticate_by_access_token(access_token: str) -> UserInfo:
     try:
         data = jwt.decode(
             access_token, config.jwt_secret, algorithms=[config.jwt_algorithm]
@@ -31,7 +31,11 @@ async def authenticate_by_access_token(access_token: str) -> UserInfo:
 
 
 async def refresh_tokens(refresh_token: str, *, conn: AsyncSession) -> tuple[str, str]:
-    q = select(SessionModel).where(SessionModel.token == refresh_token).options(joinedload(SessionModel.user))
+    q = (
+        select(SessionModel)
+        .where(SessionModel.token == refresh_token)
+        .options(joinedload(SessionModel.user))
+    )
     data = await conn.execute(q)
 
     if not (session := data.scalar_one_or_none()):
@@ -48,7 +52,8 @@ async def refresh_tokens(refresh_token: str, *, conn: AsyncSession) -> tuple[str
         session = SessionModel(
             user_id=user_id,
             token=generate_refresh_token(),
-            expires=datetime.utcnow() + timedelta(days=config.access_token_duration_minutes),
+            expires=datetime.utcnow()
+            + timedelta(days=config.access_token_duration_minutes),
         )
         conn.add(session)
         refresh_token = session.token
@@ -58,7 +63,7 @@ async def refresh_tokens(refresh_token: str, *, conn: AsyncSession) -> tuple[str
         {
             "user": user_info,
             "exp": datetime.utcnow()
-                   + timedelta(minutes=config.access_token_duration_minutes),
+            + timedelta(minutes=config.access_token_duration_minutes),
         },
         config.jwt_secret,
         algorithm=config.jwt_algorithm,

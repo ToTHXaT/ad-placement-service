@@ -18,5 +18,3 @@ class AdvertInfo(AdvertCreation):
     created_at: datetime
     updated_at: datetime
     advertiser: UserInfo
-
-

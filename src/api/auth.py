@@ -16,16 +16,16 @@ from src.db.db import make_session
 api_key_refresh = APIKeyCookie(name=config.refresh_token_cookie_name, auto_error=False)
 api_key_access = APIKeyCookie(name=config.access_token_cookie_name, auto_error=False)
 
-auth = APIRouter()
+router = APIRouter()
 
 
-async def get_current_user(
+def get_current_user(
     access_token: str | None = Security(api_key_access),
 ) -> UserInfo:
     if access_token is None:
         raise HTTPException(401, "Not authenticated")
 
-    return await session_service.authenticate_by_access_token(access_token)
+    return session_service.authenticate_by_access_token(access_token)
 
 
 def set_cookie_tokens(refresh_token: str, access_token: str, res: Response):
@@ -48,7 +48,7 @@ def set_cookie_tokens(refresh_token: str, access_token: str, res: Response):
     )
 
 
-@auth.post("/signup", response_model=UserInfo, status_code=201)
+@router.post("/signup", response_model=UserInfo, status_code=201)
 async def signup(
     user_c: UserCreate, req: Request, res: Response, conn: AsyncSession = Depends(make_session)
 ) -> UserInfo:
@@ -61,7 +61,7 @@ async def signup(
     return user
 
 
-@auth.post("/login", response_model=UserInfo, status_code=200)
+@router.post("/login", response_model=UserInfo, status_code=200)
 async def login(
     user_l: UserLogin, res: Response, conn: AsyncSession = Depends(make_session)
 ) -> UserInfo:
@@ -74,7 +74,7 @@ async def login(
     return user
 
 
-@auth.get("/refresh_tokens")
+@router.get("/refresh_tokens")
 async def refresh_tokens(
     res: Response,
     refresh_token: str | None = Security(api_key_refresh),
@@ -86,3 +86,8 @@ async def refresh_tokens(
     set_cookie_tokens(refresh_token, access_token, res)
 
     return {"success": True}
+
+
+@router.post("/grant-admin/{user_id}")
+async def grant_admin(user_id: int, grantor: UserInfo = Depends(get_current_user), conn: AsyncSession = Depends(make_session)) -> UserInfo:
+    return await user_service.grant_admin(grantor, user_id, conn=conn)
