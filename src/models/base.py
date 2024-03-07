@@ -8,7 +8,7 @@ from sqlalchemy.orm import Mapped, mapped_column, DeclarativeBase, declared_attr
 class Base(DeclarativeBase):
     """Base class for our models"""
 
-    __repr_cols__ = tuple('id')
+    __repr_cols__ = tuple("id")
 
     def __repr__(self):
         cols = []
