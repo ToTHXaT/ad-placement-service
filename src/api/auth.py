@@ -28,6 +28,15 @@ def get_current_user(
     return session_service.authenticate_by_access_token(access_token)
 
 
+def get_admin_user(
+        user: UserInfo = Depends(get_current_user),
+) -> UserInfo:
+    if not user.is_admin:
+        raise HTTPException(403, "Not an admin")
+
+    return user
+
+
 def set_cookie_tokens(refresh_token: str, access_token: str, res: Response):
     res.set_cookie(
         config.access_token_cookie_name,
