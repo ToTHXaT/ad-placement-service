@@ -3,11 +3,11 @@ from typing import Literal
 from fastapi import HTTPException
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.sql import select, delete, asc, desc
+from sqlalchemy.sql import select, delete, asc, desc, func
 from sqlalchemy.orm import joinedload
 
 from src.models import AdvertModel, AdvertType
-from src.schemas import AdvertCreation, AdvertInfo, UserInfo, Success
+from src.schemas import AdvertCreation, AdvertInfo, UserInfo, Success, AdvertFiltration
 
 
 async def create_advert(
@@ -46,12 +46,10 @@ SortField = Literal[
 SortDir = Literal["asc", "desc"]
 
 
-# class Filter(BaseModel)
-
-
 async def list_adverts(
     page: int,
     per_page: int,
+    advert_filtration: AdvertFiltration,
     sort_by: SortField = "created_at",
     sort_dir: SortDir = "desc",
     *,
@@ -63,10 +61,22 @@ async def list_adverts(
         case "desc":
             sort_func = desc
 
+    q = select(AdvertModel).options(joinedload(AdvertModel.advertiser))
+    if s := advert_filtration.title_includes:
+        q = q.filter(AdvertModel.title.ilike(f'%{s}%'))
+    if s := advert_filtration.body_includes:
+        q = q.filter(AdvertModel.body.ilike(f'%{s}%'))
+    if s := advert_filtration.type:
+        q = q.filter(AdvertModel.type == s)
+    if s := advert_filtration.since:
+        q = q.filter(AdvertModel.updated_at >= s)
+    if s := advert_filtration.before:
+        q = q.filter(AdvertModel.updated_at <= s)
+    if s := advert_filtration.advertiser__id:
+        q = q.filter(AdvertModel.advertiser_id == s)
+
     q = (
-        select(AdvertModel)
-        .options(joinedload(AdvertModel.advertiser))
-        .order_by(sort_func(AdvertModel.__table__.c[sort_by]))
+        q.order_by(sort_func(AdvertModel.__table__.c[sort_by]))
         .limit(per_page)
         .offset((page - 1) * per_page)
     )
