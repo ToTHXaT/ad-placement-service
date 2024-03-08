@@ -18,10 +18,11 @@ async def signup(user_c: UserCreate, *, conn: AsyncSession) -> UserInfo:
             is_admin=False,
         )
         conn.add(user)
+        await conn.flush()
+        user_info = UserInfo.from_orm(user)
         await conn.commit()
-    await conn.refresh(user)
 
-    return UserInfo.from_orm(user)
+    return user_info
 
 
 async def login(user_l: UserLogin, *, conn: AsyncSession) -> UserInfo:
@@ -54,10 +55,10 @@ async def grant_admin(grantor: UserInfo, grantee_id: int, *, conn: AsyncSession)
     async with conn.begin_nested():
         grantee.is_admin = True
         conn.add(grantee)
+        user_info = UserInfo.from_orm(grantee)
         await conn.commit()
-    await conn.refresh(grantee)
 
-    return UserInfo.from_orm(grantee)
+    return user_info
 
 
 async def ban_user(user_id, *, conn: AsyncSession) -> UserInfo:
