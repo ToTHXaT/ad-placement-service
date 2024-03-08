@@ -9,7 +9,7 @@ from src.schemas import ComplaintCreation, ComplaintInfo, UserInfo, Pagination
 router = APIRouter()
 
 
-@router.post("/advert/{advert_id}/complaint/new")
+@router.post("/advert/{advert_id}/complaint/new", status_code=201)
 async def create_complaint(
     complaint_c: ComplaintCreation,
     advert_id: int,

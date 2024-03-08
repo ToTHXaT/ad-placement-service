@@ -53,11 +53,6 @@ if config.telegram_bot_token and config.telegram_chat_id:
         raise e
 
 
-@app.get("/error")
-async def error():
-    raise ValueError("Something went wrong")
-
-
 app.include_router(auth_router, prefix="/api/auth", tags=["auth"])
 app.include_router(user_router, prefix="/api/user", tags=["user"])
 app.include_router(advert_router, prefix="/api/advert", tags=["advert"])

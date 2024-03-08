@@ -12,16 +12,16 @@ from src.api.auth import get_current_user
 router = APIRouter()
 
 
-@router.post("/new")
+@router.post("/new", status_code=201)
 async def create_advert(
     advert_c: AdvertCreation,
     user: UserInfo = Depends(get_current_user),
     conn: AsyncSession = Depends(make_session),
-):
+) -> AdvertInfo:
     return await advert_service.create_advert(advert_c, user, conn=conn)
 
 
-@router.get("/all", response_model=list[AdvertInfo])
+@router.get("/all")
 async def list_all_adverts(
     conn: AsyncSession = Depends(make_session),
     advert_sorting: AdvertSorting = Depends(),

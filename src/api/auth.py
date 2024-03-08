@@ -62,7 +62,7 @@ def set_cookie_tokens(refresh_token: str, access_token: str, res: Response):
     )
 
 
-@router.post("/signup", response_model=UserInfo, status_code=201)
+@router.post("/signup", status_code=201)
 async def signup(
     user_c: UserCreate, req: Request, res: Response, conn: AsyncSession = Depends(make_session)
 ) -> UserInfo:
@@ -75,7 +75,7 @@ async def signup(
     return user
 
 
-@router.post("/login", response_model=UserInfo, status_code=200)
+@router.post("/login", status_code=200)
 async def login(
     user_l: UserLogin, res: Response, conn: AsyncSession = Depends(make_session)
 ) -> UserInfo:

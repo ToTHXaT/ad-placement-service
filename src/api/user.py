@@ -22,5 +22,5 @@ async def ban_user(user_id: int, _admin: UserInfo = Depends(get_admin_user), con
 
 
 @router.post("/{user_id}/unban")
-async def ban_user(user_id: int, _admin: UserInfo = Depends(get_admin_user), conn: AsyncSession = Depends(make_session)) -> UserInfo:
+async def unban_user(user_id: int, _admin: UserInfo = Depends(get_admin_user), conn: AsyncSession = Depends(make_session)) -> UserInfo:
     return await user_service.unban_user(user_id, conn=conn)

@@ -11,7 +11,7 @@ from src.db.db import make_session
 router = APIRouter()
 
 
-@router.post("/advert/{advert_id}/comment/new")
+@router.post("/advert/{advert_id}/comment/new", status_code=201)
 async def leave_a_comment(advert_id: int, comment_c: CommentCreation, user: UserInfo = Depends(get_current_user),
                         conn: AsyncSession = Depends(make_session)) -> CommentInfo:
     return await comment_service.leave_comment(advert_id, user, comment_c, conn=conn)
