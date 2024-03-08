@@ -83,8 +83,10 @@ async def delete_advert(
     res = await conn.execute(q)
     advert = res.one_or_none()
 
+    if advert is None:
+        raise HTTPException(404, "Advert not found")
     if advert[0] != user.id:
-        raise HTTPException(403, "No advert or not the advert owner")
+        raise HTTPException(403, "Not the advert owner")
 
     async with conn.begin_nested():
         q = delete(AdvertModel).where(AdvertModel.id == advert_id)
