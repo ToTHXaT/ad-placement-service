@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.services import comment_service
-from src.shemas import CommentCreation, CommentInfo, UserInfo, Success
+from src.schemas import CommentCreation, CommentInfo, UserInfo, Success
 
 from src.api.auth import get_current_user
 from src.db.db import make_session

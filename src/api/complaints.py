@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.api.auth import get_admin_user, get_current_user
 from src.db.db import make_session
 from src.services import complaint_service
-from src.shemas import ComplaintCreation, ComplaintInfo, UserInfo
+from src.schemas import ComplaintCreation, ComplaintInfo, UserInfo
 
 
 router = APIRouter()

@@ -2,7 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql import select
 
 from src.models import ComplaintModel
-from src.shemas import ComplaintCreation, ComplaintInfo
+from src.schemas import ComplaintCreation, ComplaintInfo
 
 
 async def create_complaint(complaint_c: ComplaintCreation, advert_id: int, complainant_id: int, *, conn: AsyncSession):

@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.services import user_service
 from src.api.auth import get_current_user, get_admin_user
-from src.shemas import UserInfo
+from src.schemas import UserInfo
 from src.db.db import make_session
 
 

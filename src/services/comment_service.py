@@ -7,7 +7,7 @@ from sqlalchemy.sql import select, delete, asc, desc
 from sqlalchemy.orm import joinedload
 
 from src.models import AdvertModel, AdvertType, CommentModel
-from src.shemas import (
+from src.schemas import (
     AdvertCreation,
     AdvertInfo,
     UserInfo,

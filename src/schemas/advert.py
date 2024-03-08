@@ -2,7 +2,7 @@ from datetime import datetime
 from .base import OrmModel
 
 from src.models import AdvertType
-from src.shemas import UserInfo
+from src.schemas import UserInfo
 
 
 class AdvertCreation(OrmModel):

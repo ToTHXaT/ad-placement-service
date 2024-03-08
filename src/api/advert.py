@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.shemas import AdvertCreation, AdvertInfo, UserInfo, UpdateAdvertType, Success
+from src.schemas import AdvertCreation, AdvertInfo, UserInfo, UpdateAdvertType, Success
 from src.services import advert_service
 from src.services.advert_service import SortDir, SortField
 

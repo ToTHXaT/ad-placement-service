@@ -4,12 +4,12 @@ from fastapi.security.api_key import APIKeyCookie
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.config import config
-from src.shemas import Success
+from src.schemas import Success
 
 from src.services import session_service
 from src.services import user_service
 
-from src.shemas import UserCreate, UserInfo, UserLogin
+from src.schemas import UserCreate, UserInfo, UserLogin
 
 from src.db.db import make_session
 

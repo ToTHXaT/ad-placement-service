@@ -3,7 +3,7 @@ from sqlalchemy.sql import select
 
 from fastapi import HTTPException
 
-from src.shemas import UserCreate, UserInfo, UserLogin
+from src.schemas import UserCreate, UserInfo, UserLogin
 from src.models import UserModel
 
 

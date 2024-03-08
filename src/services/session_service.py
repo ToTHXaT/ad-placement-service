@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql import select
 from sqlalchemy.orm import joinedload
 
-from src.shemas import UserCreate, UserInfo, UserLogin
+from src.schemas import UserCreate, UserInfo, UserLogin
 from src.models import UserModel, SessionModel
 
 from src.config import config
