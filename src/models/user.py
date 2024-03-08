@@ -1,7 +1,7 @@
 import enum
 from typing import TYPE_CHECKING
 
-from sqlalchemy import String
+from sqlalchemy import String, text
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
 from passlib.context import CryptContext
@@ -36,6 +36,7 @@ class UserModel(Base):
     phone: Mapped[str | None]
     shown_name: Mapped[str | None] = mapped_column(String(128))
     is_admin: Mapped[bool] = mapped_column(default=False)
+    is_banned: Mapped[bool] = mapped_column(server_default=text("false"))
     registered_at: Mapped[created_at_col]
 
     adverts: Mapped[list["AdvertModel"]] = relationship(back_populates="advertiser")

@@ -25,7 +25,12 @@ def get_current_user(
     if access_token is None:
         raise HTTPException(401, "Not authenticated")
 
-    return session_service.authenticate_by_access_token(access_token)
+    user_info = session_service.authenticate_by_access_token(access_token)
+
+    if user_info.is_banned:
+        raise HTTPException(403, "User is banned")
+
+    return user_info
 
 
 def get_admin_user(
@@ -97,6 +102,3 @@ async def refresh_tokens(
     return {"success": True}
 
 
-@router.post("/grant-admin/{user_id}")
-async def grant_admin(user_id: int, grantor: UserInfo = Depends(get_current_user), conn: AsyncSession = Depends(make_session)) -> UserInfo:
-    return await user_service.grant_admin(grantor, user_id, conn=conn)

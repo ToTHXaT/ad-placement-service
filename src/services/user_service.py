@@ -58,3 +58,41 @@ async def grant_admin(grantor: UserInfo, grantee_id: int, *, conn: AsyncSession)
     await conn.refresh(grantee)
 
     return UserInfo.from_orm(grantee)
+
+
+async def ban_user(user_id, *, conn: AsyncSession) -> UserInfo:
+    q = select(UserModel).where(UserModel.id == user_id)
+    res = await conn.execute(q)
+    user = res.scalar_one_or_none()
+
+    if user is None:
+        raise HTTPException(404, "User not found")
+    if user.is_banned:
+        raise HTTPException(400, "User is already banned")
+
+    async with conn.begin_nested():
+        user.is_banned = True
+        conn.add(user)
+        user_info = UserInfo.from_orm(user)
+        await conn.commit()
+
+    return user_info
+
+
+async def unban_user(user_id, *, conn: AsyncSession) -> UserInfo:
+    q = select(UserModel).where(UserModel.id == user_id)
+    res = await conn.execute(q)
+    user = res.scalar_one_or_none()
+
+    if user is None:
+        raise HTTPException(404, "User not found")
+    if not user.is_banned:
+        raise HTTPException(400, "User is not banned")
+
+    async with conn.begin_nested():
+        user.is_banned = False
+        conn.add(user)
+        user_info = UserInfo.from_orm(user)
+        await conn.commit()
+
+    return user_info

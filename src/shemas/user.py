@@ -24,3 +24,4 @@ class UserInfo(OrmModel):
     email: str | None = None
     phone: str | None = None
     is_admin: bool
+    is_banned: bool
