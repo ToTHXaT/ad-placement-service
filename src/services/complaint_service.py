@@ -9,6 +9,7 @@ async def create_complaint(complaint_c: ComplaintCreation, advert_id: int, compl
     async with conn.begin_nested():
         complaint = ComplaintModel(body=complaint_c.body, complainant_id=complainant_id, advert_id=advert_id)
         conn.add(complaint)
+        await conn.flush()
         complaint_info = ComplaintInfo.from_orm(complaint)
         await conn.commit()
 
