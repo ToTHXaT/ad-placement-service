@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.services import comment_service
-from src.shemas import CommentCreation, CommentInfo, UserInfo
+from src.shemas import CommentCreation, CommentInfo, UserInfo, Success
 
 from src.api.auth import get_current_user
 from src.db.db import make_session
@@ -23,5 +23,5 @@ async def get_comments_of_the_advert(advert_id: int, conn: AsyncSession = Depend
 
 
 @router.delete("/comment/{comment_id}")
-async def delete_comment(comment_id: int, user: UserInfo = Depends(get_current_user), conn: AsyncSession = Depends(make_session)):
+async def delete_comment(comment_id: int, user: UserInfo = Depends(get_current_user), conn: AsyncSession = Depends(make_session)) -> Success:
     return await comment_service.delete_comment(comment_id, user, conn=conn)
