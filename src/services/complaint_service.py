@@ -9,10 +9,10 @@ async def create_complaint(complaint_c: ComplaintCreation, advert_id: int, compl
     async with conn.begin_nested():
         complaint = ComplaintModel(body=complaint_c.body, complainant_id=complainant_id, advert_id=advert_id)
         conn.add(complaint)
+        complaint_info = ComplaintInfo.from_orm(complaint)
         await conn.commit()
 
-    await conn.refresh(complaint)
-    return ComplaintInfo.from_orm(complaint)
+    return complaint_info
 
 
 async def get_complaints(page: int, per_page: int, *, advert_id: int | None = None, conn: AsyncSession) -> list[ComplaintInfo]:
