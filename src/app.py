@@ -9,7 +9,7 @@ from src.api.complaints import router as complaints_router
 from src.api.user import router as user_router
 
 
-app = FastAPI()
+app = FastAPI(title="Ad placement service API")
 
 
 app.include_router(auth_router, prefix="/api/auth", tags=["auth"])
