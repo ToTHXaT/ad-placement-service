@@ -25,8 +25,8 @@ class Config(BaseModel):
     jwt_secret: str
     jwt_algorithm: str
 
-    telegram_bot_token: str | None
-    telegram_chat_id: str
+    telegram_bot_token: str | None = None
+    telegram_chat_id: str | None = None
 
 
 config = Config(
