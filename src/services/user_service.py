@@ -1,4 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql import select
 
 from fastapi import HTTPException
@@ -9,18 +10,21 @@ from src.models import UserModel
 
 async def signup(user_c: UserCreate, *, conn: AsyncSession) -> UserInfo:
     async with conn.begin():
-        user = UserModel(
-            username=user_c.username,
-            password=user_c.password,
-            email=user_c.email,
-            phone=user_c.phone,
-            shown_name=user_c.shown_name,
-            is_admin=False,
-        )
-        conn.add(user)
-        await conn.flush()
-        user_info = UserInfo.from_orm(user)
-        await conn.commit()
+        try:
+            user = UserModel(
+                username=user_c.username,
+                password=user_c.password,
+                email=user_c.email,
+                phone=user_c.phone,
+                shown_name=user_c.shown_name,
+                is_admin=False,
+            )
+            conn.add(user)
+            await conn.flush()
+            user_info = UserInfo.from_orm(user)
+            await conn.commit()
+        except IntegrityError:
+            raise HTTPException(400, "User with this username already exists")
 
     return user_info
 

@@ -3,6 +3,7 @@ import os
 from dotenv import load_dotenv
 from pydantic import BaseModel
 
+from src.logger import logger
 
 load_dotenv()
 
@@ -24,6 +25,9 @@ class Config(BaseModel):
     jwt_secret: str
     jwt_algorithm: str
 
+    telegram_bot_token: str | None
+    telegram_chat_id: str
+
 
 config = Config(
     db_host=os.getenv("DB_HOST"),
@@ -38,6 +42,9 @@ config = Config(
     access_token_duration_minutes=int(os.getenv("ACCESS_TOKEN_DURATION_MINUTES", "30")),
     jwt_secret=os.getenv("JWT_SECRET", None),
     jwt_algorithm=os.getenv("JWT_ALGORITHM", "HS256"),
+    telegram_bot_token=os.getenv("TELEGRAM_BOT_TOKEN", None),
+    telegram_chat_id=os.getenv("TELEGRAM_CHAT_ID", None)
 )
 
-print("Loaded config: ", config)
+
+logger.info("Config loaded")
