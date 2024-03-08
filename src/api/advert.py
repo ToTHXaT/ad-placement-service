@@ -2,9 +2,9 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.schemas import AdvertCreation, AdvertInfo, UserInfo, UpdateAdvertType, Success
-from src.schemas.advert import AdvertFiltration
+from src.schemas.advert import AdvertFiltration, AdvertSorting
+from src.schemas.base import Pagination
 from src.services import advert_service
-from src.services.advert_service import SortDir, SortField
 
 from src.db.db import make_session
 from src.api.auth import get_current_user
@@ -23,15 +23,16 @@ async def create_advert(
 
 @router.get("/all", response_model=list[AdvertInfo])
 async def list_all_adverts(
-    sort_dir: SortDir,
-    sort_by: SortField,
     conn: AsyncSession = Depends(make_session),
+    advert_sorting: AdvertSorting = Depends(),
+    pagination: Pagination = Depends(),
     advert_filtration: AdvertFiltration = Depends(),
-    page: int = 1,
-    per_page: int = 10,
 ) -> list[AdvertInfo]:
     return await advert_service.list_adverts(
-        advert_filtration=advert_filtration, sort_by=sort_by, sort_dir=sort_dir, conn=conn, page=page, per_page=per_page
+        advert_filtration=advert_filtration,
+        advert_sorting=advert_sorting,
+        pagination=pagination,
+        conn=conn
     )
 
 

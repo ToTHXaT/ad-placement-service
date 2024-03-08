@@ -7,7 +7,7 @@ from sqlalchemy.sql import select, delete, asc, desc, func
 from sqlalchemy.orm import joinedload
 
 from src.models import AdvertModel, AdvertType
-from src.schemas import AdvertCreation, AdvertInfo, UserInfo, Success, AdvertFiltration
+from src.schemas import AdvertCreation, AdvertInfo, UserInfo, Success, AdvertFiltration, AdvertSorting, Pagination
 
 
 async def create_advert(
@@ -36,26 +36,14 @@ async def get_advert(advert_id: int, *, conn: AsyncSession) -> AdvertInfo:
     return AdvertInfo.from_orm(advert)
 
 
-SortField = Literal[
-    "created_at",
-    "updated_at",
-    "id",
-    "title",
-    "body",
-]
-SortDir = Literal["asc", "desc"]
-
-
 async def list_adverts(
-    page: int,
-    per_page: int,
+    pagination: Pagination,
     advert_filtration: AdvertFiltration,
-    sort_by: SortField = "created_at",
-    sort_dir: SortDir = "desc",
+    advert_sorting: AdvertSorting,
     *,
     conn: AsyncSession,
 ) -> list[AdvertInfo]:
-    match sort_dir:
+    match advert_sorting.sort_dir:
         case "asc":
             sort_func = asc
         case "desc":
@@ -76,9 +64,9 @@ async def list_adverts(
         q = q.filter(AdvertModel.advertiser_id == s)
 
     q = (
-        q.order_by(sort_func(AdvertModel.__table__.c[sort_by]))
-        .limit(per_page)
-        .offset((page - 1) * per_page)
+        q.order_by(sort_func(AdvertModel.__table__.c[advert_sorting.sort_by]))
+        .limit(pagination.per_page)
+        .offset((pagination.page - 1) * pagination.per_page)
     )
 
     res = await conn.execute(q)

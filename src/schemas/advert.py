@@ -1,4 +1,5 @@
 from datetime import datetime, date
+from typing import Literal
 from .base import OrmModel
 
 from fastapi import Depends, Query
@@ -34,3 +35,14 @@ class AdvertFiltration(BaseModel):
     since: datetime | None = None
     before: datetime | None = None
     advertiser__id: int | None = None
+
+
+class AdvertSorting(BaseModel):
+    sort_by: Literal[
+        "created_at",
+        "updated_at",
+        "id",
+        "title",
+        "body",
+    ] = "updated_at"
+    sort_dir: Literal["asc", "desc"] = "asc"

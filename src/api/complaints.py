@@ -4,8 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.api.auth import get_admin_user, get_current_user
 from src.db.db import make_session
 from src.services import complaint_service
-from src.schemas import ComplaintCreation, ComplaintInfo, UserInfo
-
+from src.schemas import ComplaintCreation, ComplaintInfo, UserInfo, Pagination
 
 router = APIRouter()
 
@@ -25,19 +24,17 @@ async def create_complaint(
 @router.get("/advert/{advert_id}/complaints")
 async def get_complaints_of_the_advert(
     advert_id: int,
-    page: int = 1,
-    per_page: int = 10,
+    pagination: Pagination = Depends(),
     user: UserInfo = Depends(get_admin_user),
     conn: AsyncSession = Depends(make_session),
 ) -> list[ComplaintInfo]:
-    return await complaint_service.get_complaints(page, per_page, advert_id=advert_id, conn=conn)
+    return await complaint_service.get_complaints(pagination=pagination, advert_id=advert_id, conn=conn)
 
 
 @router.get("/complaints")
 async def get_complaints(
-        page: int = 1,
-        per_page: int = 10,
+        pagination: Pagination = Depends(),
         user: UserInfo = Depends(get_admin_user),
         conn: AsyncSession = Depends(make_session),
 ) -> list[ComplaintInfo]:
-    return await complaint_service.get_complaints(page, per_page, conn=conn)
+    return await complaint_service.get_complaints(pagination=pagination, conn=conn)
