@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.shemas import AdvertCreation, AdvertInfo, UserInfo
+from src.shemas import AdvertCreation, AdvertInfo, UserInfo, UpdateAdvertType, Success
 from src.services import advert_service
 from src.services.advert_service import SortDir, SortField
 
@@ -45,5 +45,16 @@ async def delete_advert(
     id: int,
     user: UserInfo = Depends(get_current_user),
     conn: AsyncSession = Depends(make_session),
-):
+) -> Success:
     return await advert_service.delete_advert(id, user, conn=conn)
+
+
+@router.patch("/{id}")
+async def update_advert_type(
+    id: int,
+    advert: UpdateAdvertType,
+    user: UserInfo = Depends(get_current_user),
+    conn: AsyncSession = Depends(make_session),
+) -> AdvertInfo:
+    return await advert_service.change_advert_type(id, user, advert.new_type, conn=conn)
+

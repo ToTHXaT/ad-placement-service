@@ -18,3 +18,7 @@ class AdvertInfo(AdvertCreation):
     created_at: datetime
     updated_at: datetime
     advertiser: UserInfo
+
+
+class UpdateAdvertType(OrmModel):
+    new_type: AdvertType

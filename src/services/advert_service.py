@@ -92,3 +92,24 @@ async def delete_advert(
         await conn.commit()
 
     return {"success": True}
+
+
+async def change_advert_type(advert_id: int, user: UserInfo, new_type: AdvertType, *, conn: AsyncSession) -> AdvertInfo:
+    q = select(AdvertModel).where(AdvertModel.id == advert_id).options(joinedload(AdvertModel.advertiser))
+    res = await conn.execute(q)
+    advert = res.scalar_one_or_none()
+
+    if advert is None:
+        raise HTTPException(404, "Advert not found")
+    if advert.advertiser_id != user.id and not user.is_admin:
+        raise HTTPException(403, "Neither owner nor admin")
+    if advert.type == new_type:
+        raise HTTPException(400, "Advert already has this type")
+
+    async with conn.begin_nested():
+        advert.type = new_type
+        conn.add(advert)
+        advert_info = AdvertInfo.from_orm(advert)
+        await conn.commit()
+
+    return advert_info
